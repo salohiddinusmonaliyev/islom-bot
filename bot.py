@@ -12,11 +12,6 @@ TOKEN = "6919722887:AAFZNrEdxEIh6mxLj1VYSgocMvDFlB9mTMA"
 
 users = {}
 
-
-main_keyboard = ReplyKeyboardMarkup([
-    ["Namoz vaqtlari"]
-], resize_keyboard=True)
-
 regions_keyboard = InlineKeyboardMarkup(
     [
         [
