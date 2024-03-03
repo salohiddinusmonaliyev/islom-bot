@@ -78,7 +78,7 @@ async def send_times(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     date = json_data["date"]
     weekday = json_data["weekday"]
     month = json_data["hijri_date"]["month"]
-    hijri_date = f"{json_data["hijri_date"]["day"]} {month.capitalize()}"
+    hijri_date = f"{json_data['hijri_date']['day']} {month.capitalize()}"
     times = json_data["times"]
     saharlik = times["tong_saharlik"]
     quyosh = times["quyosh"]
@@ -104,7 +104,7 @@ Xufton: {hufton}
 @{context.bot.username}
 """
     share_button = [
-        [InlineKeyboardButton("Ulashish", switch_inline_query=message)]
+        [InlineKeyboardButton("✉️ Ulashish", switch_inline_query=message)]
     ]
     await query.edit_message_text(text=message, reply_markup=InlineKeyboardMarkup(share_button), parse_mode="HTML")
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Viloyatni tanlang", reply_markup=regions_keyboard)
