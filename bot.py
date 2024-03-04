@@ -8,7 +8,7 @@ from telegram.ext import (
 
 import requests
 
-TOKEN = "6919722887:AAFZNrEdxEIh6mxLj1VYSgocMvDFlB9mTMA"
+TOKEN = "7147675131:AAE_ihI2tOJXM_bhVEbI9Rh28APmjatFqJ8"
 
 users = {}
 
@@ -55,15 +55,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def admin_handler(update: Update, context):
-
     message = update.message.text
-    split_message = message.split(" ")
 
-    text_after_admin = " ".join(split_message[1:])
-
+    message = message.replace('/admin ', '')
     for key, value in users.items():
-        user_id = value[1]
-        await context.bot.send_message(chat_id=user_id, text=f"{text_after_admin}")
+        try:
+            user_id = value[1]
+            await context.bot.send_message(chat_id=user_id, text=f"{message}\n\n<span class='tg-spoiler'>@{context.bot.username}</span>", parse_mode="HTML")
+        except Exception as e:
+            print("Failed to send message to user: %s", e)
+
+
 
 async def send_times(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
