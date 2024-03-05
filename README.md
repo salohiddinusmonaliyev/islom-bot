@@ -1,2 +1,3 @@
 # islom-bot
- Namoz vaqtlari
+ 
+<a href="https://t.me/namozvaqti_uzbekistan_bot">Namoz vaqtlari BOT</a>
