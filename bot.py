@@ -51,21 +51,24 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user.append(update.effective_user.id)
 
     users[f"user-{update.effective_user.id}"] = user
-    await update.message.reply_html(f'Assalomu alaykum {update.effective_user.first_name}\n\n<i>Botdagi foydalanuvchilar soni: {len(users)}</i>', reply_markup=regions_keyboard)
+    await update.message.reply_html(f'Assalomu alaykum {update.effective_user.first_name}', reply_markup=regions_keyboard)
 
 
 async def admin_handler(update: Update, context):
     message = update.message.text
-
+    share_button = [
+        [InlineKeyboardButton("✉️ Ulashish", switch_inline_query=message)]
+    ]
     message = message.replace('/admin ', '')
     for key, value in users.items():
         try:
             user_id = value[1]
-            await context.bot.send_message(chat_id=user_id, text=f"{message}\n\n<span class='tg-spoiler'>@{context.bot.username}</span>", parse_mode="HTML")
+            await context.bot.send_message(chat_id=user_id, text=f"{message}\n\n<span class='tg-spoiler'>@{context.bot.username}</span>", parse_mode="HTML", reply_markup=InlineKeyboardMarkup(share_button))
         except Exception as e:
             print("Failed to send message to user: %s", e)
 
-
+async def users(update: Update, context):
+    await update.message.reply_html("<i><span class='tg-spoiler'>Botdagi foydalanuvchilar soni: ({len(users)}+100+5*2*1+1)-111</span></i>")
 
 async def send_times(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
@@ -91,11 +94,11 @@ Namoz vaqtlari 2️⃣0️⃣2️⃣4️⃣
 
 {date} | {hijri_date} | {weekday}
 
-Bomdod (Saharlik): {saharlik}
+Bomdod: {saharlik}
 Quyosh: {quyosh}
 Peshin: {peshin}
 Asr: {asr}
-Shom (Iftor): {shom}
+Shom: {shom}
 Xufton: {hufton}
 
 @{context.bot.username}
@@ -110,6 +113,7 @@ def main() -> None:
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("admin", admin_handler))
+    application.add_handler(CommandHandler("user", users))
 
     application.add_handler(CallbackQueryHandler(send_times))
 
