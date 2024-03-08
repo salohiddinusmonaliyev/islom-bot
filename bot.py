@@ -5,12 +5,17 @@ from telegram.ext import (
     ContextTypes,
     CallbackQueryHandler
 )
-
+from bs4 import BeautifulSoup
 import requests
 
-TOKEN = "7147675131:AAE_ihI2tOJXM_bhVEbI9Rh28APmjatFqJ8"
+TOKEN = "6919722887:AAFtph_D82Esdc78wgiD2yZJTiKCt2KJOv0"
 
 users = {}
+
+
+main_keyboard = ReplyKeyboardMarkup([
+    ["Namoz vaqtlari"]
+], resize_keyboard=True)
 
 regions_keyboard = InlineKeyboardMarkup(
     [
@@ -42,7 +47,10 @@ regions_keyboard = InlineKeyboardMarkup(
     ]
 )
 
-
+def extract_text(text):
+    soup = BeautifulSoup(text, 'html.parser')
+    text = soup.text.strip()
+    return text
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -51,24 +59,21 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user.append(update.effective_user.id)
 
     users[f"user-{update.effective_user.id}"] = user
-    await update.message.reply_html(f'Assalomu alaykum {update.effective_user.first_name}', reply_markup=regions_keyboard)
-
+    await update.message.reply_html(f'Assalomu alaykum {update.effective_user.first_name}\n\n<i>{len(users)}</i>', reply_markup=regions_keyboard)
 
 async def admin_handler(update: Update, context):
     message = update.message.text
-    share_button = [
-        [InlineKeyboardButton("✉️ Ulashish", switch_inline_query=message)]
-    ]
+
     message = message.replace('/admin ', '')
     for key, value in users.items():
         try:
             user_id = value[1]
+            share_button = [
+                [InlineKeyboardButton("✉️ Ulashish", switch_inline_query=extract_text(message))]
+            ]
             await context.bot.send_message(chat_id=user_id, text=f"{message}\n\n<span class='tg-spoiler'>@{context.bot.username}</span>", parse_mode="HTML", reply_markup=InlineKeyboardMarkup(share_button))
         except Exception as e:
             print("Failed to send message to user: %s", e)
-
-async def users(update: Update, context):
-    await update.message.reply_html("<i><span class='tg-spoiler'>Botdagi foydalanuvchilar soni: ({len(users)}+100+5*2*1+1)-111</span></i>")
 
 async def send_times(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
@@ -87,7 +92,7 @@ async def send_times(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
     shom = times["shom_iftor"]
     hufton = times["hufton"]
 
-    message = f"""
+    message = f"""<b>
 Namoz vaqtlari 2️⃣0️⃣2️⃣4️⃣
 
 🌆 {region}
@@ -101,10 +106,10 @@ Asr: {asr}
 Shom: {shom}
 Xufton: {hufton}
 
-@{context.bot.username}
+@{context.bot.username}</b>
 """
     share_button = [
-        [InlineKeyboardButton("✉️ Ulashish", switch_inline_query=message)]
+        [InlineKeyboardButton("✉️ Ulashish", switch_inline_query=f'\n\n{extract_text(message).replace("@namozvaqti_uzbekistan_bot", "")}')]
     ]
     await query.edit_message_text(text=message, reply_markup=InlineKeyboardMarkup(share_button), parse_mode="HTML")
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Viloyatni tanlang", reply_markup=regions_keyboard)
@@ -113,7 +118,6 @@ def main() -> None:
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("admin", admin_handler))
-    application.add_handler(CommandHandler("user", users))
 
     application.add_handler(CallbackQueryHandler(send_times))
 
