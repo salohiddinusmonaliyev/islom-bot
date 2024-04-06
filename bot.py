@@ -8,7 +8,12 @@ from telegram.ext import (
 from bs4 import BeautifulSoup
 import requests
 
+from datetime import datetime
+from hijri_converter import convert
+
 TOKEN = "6919722887:AAFtph_D82Esdc78wgiD2yZJTiKCt2KJOv0"
+
+ADMIN = "39444524234"
 
 users = {}
 
@@ -57,9 +62,37 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = []
     user.append(update.effective_user.first_name)
     user.append(update.effective_user.id)
-
+    join_key = InlineKeyboardMarkup(
+        [
+            [
+                InlineKeyboardButton("Namoz Vaqti | Uzbekistan", url="https://t.me/+p7L_ED2vzf42MjQy")
+            ]
+        ]
+    )
     users[f"user-{update.effective_user.id}"] = user
-    await update.message.reply_html(f'Assalomu alaykum {update.effective_user.first_name}\n\n<i>{len(users)}</i>', reply_markup=regions_keyboard)
+    channel_id = "-1002120047351"
+    if update.message:
+        chat_id = update.message.chat_id
+
+        member = await context.bot.get_chat_member(channel_id, chat_id)
+
+        if update.effective_user.id == ADMIN:
+            await update.message.reply_html(f'Assalomu alaykum admin!\n<i><b>Foydalanuvchilar soni: {len(users)}</b></i>', reply_markup=regions_keyboard)
+        elif member.status == "creator":
+            await update.message.reply_html(f'<b>Assalomu alaykum {update.effective_user.first_name}!</b>\n\nViloyatlardan birini tanlang', reply_markup=regions_keyboard)
+        elif str(member.status)=="left":
+            await update.message.reply_html(f'<b>Assalomu alaykum {update.effective_user.first_name}!</b>\nAvval quyidagi kanalga obuna bo\'ling\n\n<i>Obuna bo\'lgach <b>/start</b> ni qaytadan bosing</i>', reply_markup=join_key)
+    elif update.callback_query and update.callback_query.message:
+        chat_id = update.callback_query.from_user.id
+
+        member = await context.bot.get_chat_member(channel_id, chat_id)
+
+        if update.effective_user.id == ADMIN:
+            await update.callback_query.message.reply_html(f'Assalomu alaykum admin!\n<i><b>Foydalanuvchilar soni: {len(users)}</b></i>', reply_markup=regions_keyboard)
+        elif member.status == "creator":
+            await update.callback_query.message.reply_html(f'<b>Assalomu alaykum {update.effective_user.first_name}!</b>\n\nViloyatlardan birini tanlang', reply_markup=regions_keyboard)
+        elif str(member.status)=="left":
+            await update.callback_query.message.reply_html(f'<b>Assalomu alaykum {update.effective_user.first_name}!</b>\nAvval quyidagi kanalga obuna bo\'ling\n\n<i>Obuna bo\'lgach <b>/start</b> ni qaytadan bosing</i>', reply_markup=join_key)
 
 async def admin_handler(update: Update, context):
     message = update.message.text
@@ -77,27 +110,34 @@ async def admin_handler(update: Update, context):
 
 async def send_times(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
-    response = requests.get(f"https://islomapi.uz/api/present/day?region={query.data}")
-    json_data = response.json()
-    region = json_data["region"]
-    date = json_data["date"]
-    weekday = json_data["weekday"]
-    month = json_data["hijri_date"]["month"]
-    hijri_date = f"{json_data['hijri_date']['day']} {month.capitalize()}"
-    times = json_data["times"]
-    saharlik = times["tong_saharlik"]
-    quyosh = times["quyosh"]
-    peshin = times["peshin"]
-    asr = times["asr"]
-    shom = times["shom_iftor"]
-    hufton = times["hufton"]
-
-    message = f"""<b>
+    if query.data == "back":
+        return await start(update, context)
+    else:
+        response = requests.get(f"https://islomapi.uz/api/present/day?region={query.data}")
+        json_data = response.json()
+        region = json_data["region"]
+        date = json_data["date"]
+        weekday = json_data["weekday"]
+        month = json_data["hijri_date"]["month"]
+        times = json_data["times"]
+        saharlik = times["tong_saharlik"]
+        quyosh = times["quyosh"]
+        peshin = times["peshin"]
+        asr = times["asr"]
+        shom = times["shom_iftor"]
+        hufton = times["hufton"]
+        war = datetime.strptime(date, '%Y-%m-%d')
+        war1 = convert.Gregorian.fromdate(war).to_hijri()
+        hijri_year = war1.year
+        hijri_date = war1.day
+        hijri_month = war1.month_name()
+        print
+        message = f"""<b>
 Namoz vaqtlari 2️⃣0️⃣2️⃣4️⃣
 
 🌆 {region}
 
-{date} | {hijri_date} | {weekday}
+{date} | {hijri_year}-yil {hijri_date}-{hijri_month} | {weekday}
 
 Bomdod: {saharlik}
 Quyosh: {quyosh}
@@ -107,12 +147,16 @@ Shom: {shom}
 Xufton: {hufton}
 
 @{context.bot.username}</b>
-"""
-    share_button = [
-        [InlineKeyboardButton("✉️ Ulashish", switch_inline_query=f'\n\n{extract_text(message).replace("@namozvaqti_uzbekistan_bot", "")}')]
-    ]
-    await query.edit_message_text(text=message, reply_markup=InlineKeyboardMarkup(share_button), parse_mode="HTML")
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Viloyatni tanlang", reply_markup=regions_keyboard)
+    """
+        share_button = [
+            [
+                InlineKeyboardButton("✉️ Ulashish", switch_inline_query=f'\n\n{extract_text(message).replace("@namozvaqti_uzbekistan_bot", "")}'),
+            ],
+            [
+                InlineKeyboardButton("🔙 Ortga", callback_data="back")
+            ]
+        ]
+        await query.edit_message_text(text=message, reply_markup=InlineKeyboardMarkup(share_button), parse_mode="HTML")
 def main() -> None:
     application = Application.builder().token(TOKEN).build()
 
