@@ -78,7 +78,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
         if update.effective_user.id == ADMIN:
             await update.message.reply_html(f'Assalomu alaykum admin!\n<i><b>Foydalanuvchilar soni: {len(users)}</b></i>', reply_markup=regions_keyboard)
-        elif member.status == "creator":
+        elif member.status == "creator" or member.status == "member":
             await update.message.reply_html(f'<b>Assalomu alaykum {update.effective_user.first_name}!</b>\n\nViloyatlardan birini tanlang', reply_markup=regions_keyboard)
         elif str(member.status)=="left":
             await update.message.reply_html(f'<b>Assalomu alaykum {update.effective_user.first_name}!</b>\nAvval quyidagi kanalga obuna bo\'ling\n\n<i>Obuna bo\'lgach <b>/start</b> ni qaytadan bosing</i>', reply_markup=join_key)
@@ -86,13 +86,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         chat_id = update.callback_query.from_user.id
 
         member = await context.bot.get_chat_member(channel_id, chat_id)
-
         if update.effective_user.id == ADMIN:
             await update.callback_query.message.reply_html(f'Assalomu alaykum admin!\n<i><b>Foydalanuvchilar soni: {len(users)}</b></i>', reply_markup=regions_keyboard)
-        elif member.status == "creator":
+        elif member.status == "creator" or member.status == "member":
             await update.callback_query.message.reply_html(f'<b>Assalomu alaykum {update.effective_user.first_name}!</b>\n\nViloyatlardan birini tanlang', reply_markup=regions_keyboard)
         elif str(member.status)=="left":
             await update.callback_query.message.reply_html(f'<b>Assalomu alaykum {update.effective_user.first_name}!</b>\nAvval quyidagi kanalga obuna bo\'ling\n\n<i>Obuna bo\'lgach <b>/start</b> ni qaytadan bosing</i>', reply_markup=join_key)
+
+async def group_handler(update: Update, context):
+    chat_id = "-1002120047351"
+    context.bot.send_message(chat_id=chat_id, text="Namoz Vaqtlari")
 
 async def admin_handler(update: Update, context):
     message = update.message.text
@@ -162,6 +165,8 @@ def main() -> None:
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("admin", admin_handler))
+    application.add_handler(CommandHandler("group", group_handler))
+
 
     application.add_handler(CallbackQueryHandler(send_times))
 
