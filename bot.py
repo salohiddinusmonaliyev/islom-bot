@@ -57,7 +57,6 @@ def extract_text(text):
     text = soup.text.strip()
     return text
 
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user = []
     user.append(update.effective_user.first_name)
@@ -73,9 +72,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     channel_id = "-1002120047351"
     if update.message:
         chat_id = update.message.chat_id
-
         member = await context.bot.get_chat_member(channel_id, chat_id)
-
         if update.effective_user.id == ADMIN:
             await update.message.reply_html(f'Assalomu alaykum admin!\n<i><b>Foydalanuvchilar soni: {len(users)}</b></i>', reply_markup=regions_keyboard)
         elif member.status == "creator" or member.status == "member":
@@ -166,7 +163,6 @@ def main() -> None:
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("admin", admin_handler))
     application.add_handler(CommandHandler("group", group_handler))
-
 
     application.add_handler(CallbackQueryHandler(send_times))
 
