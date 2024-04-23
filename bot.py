@@ -17,7 +17,6 @@ ADMIN = "39444524234"
 
 users = {}
 
-
 main_keyboard = ReplyKeyboardMarkup([
     ["Namoz vaqtlari"]
 ], resize_keyboard=True)
@@ -167,7 +166,6 @@ def main() -> None:
     application.add_handler(CallbackQueryHandler(send_times))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
-
 
 if __name__ == "__main__":
     main()
