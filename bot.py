@@ -112,7 +112,8 @@ async def admin_handler(update: Update, context):
 async def send_times(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     if query.data == "back":
-        context.bot.deleteMessage(chat_id=query.from_user.id, message_id=)
+        message_id = context.user_data.get("message")
+        await context.bot.deleteMessage(chat_id=query.from_user.id, message_id=message_id)
         return await start(update, context)
     else:
         response = requests.get(f"https://islomapi.uz/api/present/day?region={query.data}")
@@ -157,7 +158,8 @@ Xufton: {hufton}
                 InlineKeyboardButton("🔙 Ortga", callback_data="back")
             ]
         ]
-        await query.edit_message_text(text=message, reply_markup=InlineKeyboardMarkup(share_button), parse_mode="HTML")
+        msg = await query.edit_message_text(text=message, reply_markup=InlineKeyboardMarkup(share_button), parse_mode="HTML")
+        context.user_data["message"] = msg.id
 def main() -> None:
     application = Application.builder().token(TOKEN).build()
 
