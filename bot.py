@@ -84,7 +84,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             await update.message.reply_html(f'<b>Assalomu alaykum {update.effective_user.first_name}!</b>\nAvval quyidagi kanalga obuna bo\'ling\n\n<i>Obuna bo\'lgach <b>/start</b> ni qaytadan bosing</i>', reply_markup=join_key)
     elif update.callback_query and update.callback_query.message:
         chat_id = update.callback_query.from_user.id
-
         member = await context.bot.get_chat_member(channel_id, chat_id)
         if update.effective_user.id == ADMIN:
             await update.callback_query.message.reply_html(f'Assalomu alaykum admin!\n<i><b>Foydalanuvchilar soni: {len(users)}</b></i>', reply_markup=regions_keyboard)
@@ -99,7 +98,6 @@ async def group_handler(update: Update, context):
 
 async def admin_handler(update: Update, context):
     message = update.message.text
-
     message = message.replace('/admin ', '')
     for key, value in users.items():
         try:
@@ -114,6 +112,7 @@ async def admin_handler(update: Update, context):
 async def send_times(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     if query.data == "back":
+        context.bot.deleteMessage(chat_id=query.from_user.id, message_id=)
         return await start(update, context)
     else:
         response = requests.get(f"https://islomapi.uz/api/present/day?region={query.data}")
@@ -134,7 +133,6 @@ async def send_times(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None
         hijri_year = war1.year
         hijri_date = war1.day
         hijri_month = war1.month_name()
-        print
         message = f"""<b>
 Namoz vaqtlari 2️⃣0️⃣2️⃣4️⃣
 
