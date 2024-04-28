@@ -11,9 +11,9 @@ import requests
 from datetime import datetime
 from hijri_converter import convert
 
-TOKEN = "6919722887:AAFtph_D82Esdc78wgiD2yZJTiKCt2KJOv0"
+TOKEN = "6919722887:AAH2TRZ_67cV3W_-wvkUOxA763FPltDuJy8"
 
-ADMIN = "39444524234"
+ADMIN = "6827107114"
 
 users = {}
 
@@ -63,33 +63,34 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     join_key = InlineKeyboardMarkup(
         [
             [
-                InlineKeyboardButton("Namoz Vaqti | Uzbekistan", url="https://t.me/+p7L_ED2vzf42MjQy")
+                InlineKeyboardButton("Namoz Vaqti | Uzbekistan", url="https://t.me/+y82Q9WLbt042M2Ey")
             ]
         ]
     )
     users[f"user-{update.effective_user.id}"] = user
-    channel_id = "-1002120047351"
+    channel_id = "-1002073389981"
     if update.message:
         chat_id = update.message.chat_id
         member = await context.bot.get_chat_member(channel_id, chat_id)
-        if update.effective_user.id == ADMIN:
+        
+        if update.effective_user.id == ADMIN or member.status == "creator":
             await update.message.reply_html(f'Assalomu alaykum admin!\n<i><b>Foydalanuvchilar soni: {len(users)}</b></i>', reply_markup=regions_keyboard)
-        elif member.status == "creator" or member.status == "member":
+        elif member.status == "member":
             await update.message.reply_html(f'<b>Assalomu alaykum {update.effective_user.first_name}!</b>\n\nViloyatlardan birini tanlang', reply_markup=regions_keyboard)
         elif str(member.status)=="left":
             await update.message.reply_html(f'<b>Assalomu alaykum {update.effective_user.first_name}!</b>\nAvval quyidagi kanalga obuna bo\'ling\n\n<i>Obuna bo\'lgach <b>/start</b> ni qaytadan bosing</i>', reply_markup=join_key)
     elif update.callback_query and update.callback_query.message:
         chat_id = update.callback_query.from_user.id
         member = await context.bot.get_chat_member(channel_id, chat_id)
-        if update.effective_user.id == ADMIN:
+        if update.effective_user.id == ADMIN or member.status == "creator":
             await update.callback_query.message.reply_html(f'Assalomu alaykum admin!\n<i><b>Foydalanuvchilar soni: {len(users)}</b></i>', reply_markup=regions_keyboard)
-        elif member.status == "creator" or member.status == "member":
+        elif member.status == "member":
             await update.callback_query.message.reply_html(f'<b>Assalomu alaykum {update.effective_user.first_name}!</b>\n\nViloyatlardan birini tanlang', reply_markup=regions_keyboard)
         elif str(member.status)=="left":
             await update.callback_query.message.reply_html(f'<b>Assalomu alaykum {update.effective_user.first_name}!</b>\nAvval quyidagi kanalga obuna bo\'ling\n\n<i>Obuna bo\'lgach <b>/start</b> ni qaytadan bosing</i>', reply_markup=join_key)
 
 async def group_handler(update: Update, context):
-    chat_id = "-1002120047351"
+    chat_id = "-1002073389981"
     context.bot.send_message(chat_id=chat_id, text="Namoz Vaqtlari")
 
 async def admin_handler(update: Update, context):
