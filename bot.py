@@ -11,6 +11,8 @@ import requests
 from datetime import datetime
 from hijri_converter import convert
 
+import time
+
 TOKEN = "6919722887:AAH2TRZ_67cV3W_-wvkUOxA763FPltDuJy8"
 
 ADMIN = "6827107114"
@@ -72,7 +74,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if update.message:
         chat_id = update.message.chat_id
         member = await context.bot.get_chat_member(channel_id, chat_id)
-        
+
         if update.effective_user.id == ADMIN or member.status == "creator":
             await update.message.reply_html(f'Assalomu alaykum admin!\n<i><b>Foydalanuvchilar soni: {len(users)}</b></i>', reply_markup=regions_keyboard)
         elif member.status == "member":
@@ -91,7 +93,59 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def group_handler(update: Update, context):
     chat_id = "-1002073389981"
-    context.bot.send_message(chat_id=chat_id, text="Namoz Vaqtlari")
+    cities = [
+    "Andijon",
+    "Buxoro",
+    "Farg'ona",
+    "Jizzax",
+    "Urganch",
+    "Namangan",
+    "Navoiy",
+    "Qarshi",
+    "Nukus",
+    "Samarqand",
+    "Guliston",
+    "Termiz",
+    "Toshkent"
+]
+    for i in cities:
+        response = requests.get(f"https://islomapi.uz/api/present/day?region={i}")
+        json_data = response.json()
+        region = json_data["region"]
+        date = json_data["date"]
+        weekday = json_data["weekday"]
+        month = json_data["hijri_date"]["month"]
+        times = json_data["times"]
+        saharlik = times["tong_saharlik"]
+        quyosh = times["quyosh"]
+        peshin = times["peshin"]
+        asr = times["asr"]
+        shom = times["shom_iftor"]
+        hufton = times["hufton"]
+        war = datetime.strptime(date, '%Y-%m-%d')
+        war1 = convert.Gregorian.fromdate(war).to_hijri()
+        hijri_year = war1.year
+        hijri_date = war1.day
+        hijri_month = war1.month_name()
+        message = f"""<b>
+Namoz vaqtlari 2️⃣0️⃣2️⃣4️⃣
+
+🌆 {region}
+
+{date} | {hijri_year}-yil {hijri_date}-{hijri_month} | {weekday}
+
+Bomdod: {saharlik}
+Quyosh: {quyosh}
+Peshin: {peshin}
+Asr: {asr}
+Shom: {shom}
+Xufton: {hufton}
+
+@{context.bot.username}</b>
+    """
+        print(i)
+        await context.bot.send_message(chat_id=chat_id, text=message, parse_mode="HTML")
+        time.sleep(3)
 
 async def admin_handler(update: Update, context):
     message = update.message.text
@@ -105,6 +159,7 @@ async def admin_handler(update: Update, context):
             await context.bot.send_message(chat_id=user_id, text=f"{message}\n\n<span class='tg-spoiler'>@{context.bot.username}</span>", parse_mode="HTML", reply_markup=InlineKeyboardMarkup(share_button))
         except Exception as e:
             print("Failed to send message to user: %s", e)
+
 
 async def send_times(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
