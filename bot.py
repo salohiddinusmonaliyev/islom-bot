@@ -13,7 +13,7 @@ from hijri_converter import convert
 
 import time
 
-TOKEN = "6919722887:AAH2TRZ_67cV3W_-wvkUOxA763FPltDuJy8"
+TOKEN = "6919722887:AAHti0nVlkwVXfk5JtRRwP9ZSBWDOZ6d7_Q"
 
 ADMIN = "6827107114"
 
@@ -141,7 +141,7 @@ Asr: {asr}
 Shom: {shom}
 Xufton: {hufton}
 
-@{context.bot.username}</b>
+<i>@{context.bot.username} | @namoz_vaqti_uzbekistan</i></b>
     """
         print(i)
         await context.bot.send_message(chat_id=chat_id, text=message, parse_mode="HTML")
@@ -156,7 +156,7 @@ async def admin_handler(update: Update, context):
             share_button = [
                 [InlineKeyboardButton("✉️ Ulashish", switch_inline_query=extract_text(message))]
             ]
-            await context.bot.send_message(chat_id=user_id, text=f"{message}\n\n<span class='tg-spoiler'>@{context.bot.username}</span>", parse_mode="HTML", reply_markup=InlineKeyboardMarkup(share_button))
+            await context.bot.send_message(chat_id=user_id, text=f"{message}\n\n<span class='tg-spoiler'><i>@{context.bot.username} | @namoz_vaqti_uzbekistan</i></span>", parse_mode="HTML", reply_markup=InlineKeyboardMarkup(share_button))
         except Exception as e:
             print("Failed to send message to user: %s", e)
 
@@ -200,11 +200,11 @@ Asr: {asr}
 Shom: {shom}
 Xufton: {hufton}
 
-@{context.bot.username}</b>
+<i>@{context.bot.username} | @namoz_vaqti_uzbekistan</i></b>
     """
         share_button = [
             [
-                InlineKeyboardButton("✉️ Ulashish", switch_inline_query=f'\n\n{extract_text(message).replace("@namozvaqti_uzbekistan_bot", "")}'),
+                InlineKeyboardButton("✉️ Ulashish", switch_inline_query=f'\n\n\n{extract_text(message).replace("@namozvaqti_uzbekistan_bot", "")}'),
             ],
             [
                 InlineKeyboardButton("🔙 Ortga", callback_data="back")
